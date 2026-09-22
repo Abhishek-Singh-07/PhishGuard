@@ -737,7 +737,6 @@
     <div class="grid"></div>
 </div>
 
-
 <!-- NAVBAR -->
 
 <nav class="navbar">
@@ -763,7 +762,6 @@
     </div>
 
 </nav>
-
 
 <!-- HERO -->
 
@@ -803,7 +801,6 @@
 
 </section>
 
-
 <!-- SCANNER -->
 
 <section class="scanner-section">
@@ -821,7 +818,6 @@
             </span>
 
         </div>
-
 
         <div class="input-wrapper">
 
@@ -841,7 +837,6 @@
             </button>
 
         </div>
-
 
         <div class="examples">
 
@@ -865,7 +860,6 @@
 
         </div>
 
-
         <!-- LOADING -->
 
         <div
@@ -880,7 +874,6 @@
             </p>
 
         </div>
-
 
         <!-- RESULT -->
 
@@ -925,7 +918,6 @@
 
             </div>
 
-
             <div class="confidence-header">
 
                 <h3>
@@ -937,7 +929,6 @@
                 </span>
 
             </div>
-
 
             <div class="score-grid">
 
@@ -972,7 +963,6 @@
 
                 </div>
 
-
                 <!-- SAFE -->
 
                 <div class="score-card">
@@ -1006,7 +996,6 @@
 
             </div>
 
-
             <div class="disclaimer">
                 Model confidence represents the Random Forest
                 <code>predict_proba()</code> output and should not
@@ -1019,7 +1008,6 @@
 
 </section>
 
-
 <!-- FEATURES HEADING -->
 
 <div class="section-heading">
@@ -1029,7 +1017,6 @@
     </p>
 
 </div>
-
 
 <!-- FEATURES -->
 
@@ -1053,7 +1040,6 @@
 
     </div>
 
-
     <div class="feature-card">
 
         <div class="feature-icon">
@@ -1071,7 +1057,6 @@
         </p>
 
     </div>
-
 
     <div class="feature-card">
 
@@ -1092,7 +1077,6 @@
 
 </section>
 
-
 <!-- FOOTER -->
 
 <footer>
@@ -1101,7 +1085,6 @@
     Machine Learning Based Phishing URL Detection
 
 </footer>
-
 
 <script>
 
@@ -1148,7 +1131,37 @@
         const url = urlInput.value.trim();
 
 
+        // ---------------------------------------
+        // EMPTY INPUT VALIDATION
+        // ---------------------------------------
+
         if (!url) {
+
+            resultIcon.textContent = "⚠️";
+
+            resultTitle.textContent =
+                "Please enter a URL";
+
+            resultUrl.textContent =
+                "Enter a website URL before starting the security analysis.";
+
+            phishingValue.textContent =
+                "—";
+
+            safeValue.textContent =
+                "—";
+
+            phishingBar.style.width =
+                "0%";
+
+            safeBar.style.width =
+                "0%";
+
+            result.style.display =
+                "block";
+
+            loading.style.display =
+                "none";
 
             urlInput.focus();
 
@@ -1160,6 +1173,7 @@
         // Hide previous result
 
         result.style.display = "none";
+
 
         // Show loading
 
