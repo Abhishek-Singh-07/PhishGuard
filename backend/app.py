@@ -30,81 +30,112 @@ def home():
 @app.route("/predict", methods=["POST"])
 def predict():
 
-    data = request.get_json()
+    try:
 
-    if not data:
+        # -----------------------------------
+        # Step 1: Read JSON request
+        # -----------------------------------
+
+        data = request.get_json()
+
+        if not data:
+            return jsonify({
+                "error": "Request body is required"
+            }), 400
+
+        # -----------------------------------
+        # Step 2: Get URL
+        # -----------------------------------
+
+        url = data.get("url")
+
+        if not url:
+            return jsonify({
+                "error": "URL is required"
+            }), 400
+
+        # Remove unnecessary spaces
+        url = url.strip()
+
+        # -----------------------------------
+        # Step 3: Basic URL validation
+        # -----------------------------------
+
+        if len(url) < 4:
+            return jsonify({
+                "error": "Please enter a valid URL"
+            }), 400
+
+        # -----------------------------------
+        # Step 4: Extract 30 features
+        # -----------------------------------
+
+        features = extract_features(url)
+
+        # -----------------------------------
+        # Step 5: Convert features into
+        #         model input
+        # -----------------------------------
+
+        features_array = np.array(features).reshape(1, -1)
+
+        # -----------------------------------
+        # Step 6: Generate prediction
+        # -----------------------------------
+
+        prediction = model.predict(features_array)[0]
+
+        # -----------------------------------
+        # Step 7: Get model scores
+        # -----------------------------------
+
+        probabilities = model.predict_proba(features_array)[0]
+
+        classes = model.classes_
+
+        safe_probability = 0.0
+        phishing_probability = 0.0
+
+        for class_value, probability in zip(classes, probabilities):
+
+            if class_value == -1:
+                safe_probability = float(probability)
+
+            elif class_value == 1:
+                phishing_probability = float(probability)
+
+        # -----------------------------------
+        # Step 8: Convert prediction
+        #         into readable result
+        # -----------------------------------
+
+        if prediction == 1:
+            result = "Phishing"
+        else:
+            result = "Safe"
+
+        # -----------------------------------
+        # Step 9: Send response
+        # -----------------------------------
+
         return jsonify({
-            "error": "Request body is required"
-        }), 400
+            "url": url,
+            "prediction": result,
+            "result": int(prediction),
+            "probabilities": {
+                "safe": round(safe_probability * 100, 2),
+                "phishing": round(phishing_probability * 100, 2)
+            }
+        })
 
-    url = data.get("url")
+    except Exception as error:
 
-    if not url:
+        print("Prediction error:", error)
+
         return jsonify({
-            "error": "URL is required"
-        }), 400
-
-    # -----------------------------------
-    # Step 1: Extract 30 features
-    # -----------------------------------
-
-    features = extract_features(url)
-
-    # -----------------------------------
-    # Step 2: Convert features into
-    #         model input
-    # -----------------------------------
-
-    features_array = np.array(features).reshape(1, -1)
-
-    # -----------------------------------
-    # Step 3: Generate prediction
-    # -----------------------------------
-
-    prediction = model.predict(features_array)[0]
-
-    # -----------------------------------
-    # Step 4: Get model probabilities
-    # -----------------------------------
-
-    probabilities = model.predict_proba(features_array)[0]
-
-    classes = model.classes_
-
-    safe_probability = 0.0
-    phishing_probability = 0.0
-
-    for class_value, probability in zip(classes, probabilities):
-
-        if class_value == -1:
-            safe_probability = float(probability)
-
-        elif class_value == 1:
-            phishing_probability = float(probability)
-
-    # -----------------------------------
-    # Step 5: Convert prediction
-    #         into readable result
-    # -----------------------------------
-
-    if prediction == 1:
-        result = "Phishing"
-    else:
-        result = "Safe"
-
-    # -----------------------------------
-    # Step 6: Send JSON response
-    # -----------------------------------
-
-    return jsonify({
-        "url": url,
-        "prediction": result,
-        "result": int(prediction),
-        "probabilities": {
-            "safe": round(safe_probability * 100, 2),
-            "phishing": round(phishing_probability * 100, 2)
-        }
-    })
+            "error": "Unable to analyze the URL",
+            "details": str(error)
+        }), 500
 
 
 if __name__ == "__main__":
